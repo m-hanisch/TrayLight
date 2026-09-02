@@ -10,21 +10,29 @@
     <Button Style="{StaticResource TileButtonStyle}"
             Command="{Binding ActivateCommand}"
             ToolTip="{Binding Subtitle}"
+            MinHeight="92"
             Padding="6,10">
-        <StackPanel HorizontalAlignment="Center">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Width="32" Height="32" HorizontalAlignment="Center">
                 <Ellipse x:Name="IconBackground" />
                 <TextBlock Text="{Binding IconGlyph}"
                            Style="{StaticResource IconGlyphStyle}"
                            FontSize="16" />
             </Grid>
+            <!-- Titles wrap to two lines for longer languages (e.g. Dutch/German);
+                 anything past two lines is ellipsized and the full title is on hover.
+                 MinHeight reserves two lines so buttons in a row stay aligned. -->
             <TextBlock Text="{Binding Title}"
                        Style="{StaticResource BodyTextStyle}"
                        FontSize="11"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"
                        TextAlignment="Center"
+                       TextWrapping="Wrap"
                        TextTrimming="CharacterEllipsis"
+                       MinHeight="30"
+                       MaxHeight="30"
+                       ToolTip="{Binding Title}"
                        Margin="0,6,0,0" />
         </StackPanel>
     </Button>

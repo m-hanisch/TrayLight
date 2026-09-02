@@ -43,7 +43,16 @@
             </Grid>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                <TextBlock Text="{Binding Title}" Style="{StaticResource LabelTextStyle}" />
+                <!-- Titles wrap to two lines for longer languages (e.g. Dutch
+                     "Besturingssysteem"); MinHeight reserves two lines so
+                     neighboring tiles keep their title/value rows aligned. -->
+                <TextBlock Text="{Binding Title}"
+                           Style="{StaticResource LabelTextStyle}"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis"
+                           MinHeight="30"
+                           MaxHeight="30"
+                           ToolTip="{Binding Title}" />
                 <TextBlock Text="{Binding Value}"
                            Style="{StaticResource BodyTextStyle}"
                            FontSize="12"
