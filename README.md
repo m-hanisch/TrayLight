@@ -43,8 +43,8 @@
   ADMX policy.
 - Toast notifications for warnings raised by info tiles
 - **Multi-language UI** — auto-detects the Windows display language; ships with
-  English, German and French as runtime JSON files, and any other language can
-  be added by dropping a JSON file into the `Languages` folder — no rebuild
+  English, German, French and Dutch as runtime JSON files, and any other language
+  can be added by dropping a JSON file into the `Languages` folder — no rebuild
   required (see [Localization](#localization))
 - Light / Dark theme follows the Windows system setting
 - WPF with drop-shadow on Windows 11
@@ -188,6 +188,7 @@ drop — **no rebuild required**.
 | English  | `en.json` | Default / reference / fallback |
 | German   | `de.json` | Full |
 | French   | `fr.json` | Full |
+| Dutch    | `nl.json` | Full (community contribution, Radboud Universiteit) |
 
 ### How resolution works
 
@@ -206,11 +207,11 @@ running.
 
 ### Three ways to get a language
 
-**1. Use a built-in language (EN / DE / FR).** Nothing to do — the app picks the
-right one from the Windows display language.
+**1. Use a built-in language (EN / DE / FR / NL).** Nothing to do — the app picks
+the right one from the Windows display language.
 
-**2. Drop a custom JSON file — no rebuild needed.** To add e.g. Dutch, copy
-`en.json` to `nl.json`, translate the values, place it in
+**2. Drop a custom JSON file — no rebuild needed.** To add e.g. Italian, copy
+`en.json` to `it.json`, translate the values, place it in
 `C:\Program Files\TrayLight\Languages\`, and restart TrayLight. That's it. This
 is fully deployable at scale via a script or an **Intune Win32 app** (see
 [INTUNE-DEPLOYMENT.md](docs/INTUNE-DEPLOYMENT.md#3e-deploying-custom-language-files)).
@@ -223,14 +224,14 @@ English.
 > re-check your custom `<language>.json` against the current `en.json` and add
 > any new keys to keep the UI fully translated.
 
-Example `nl.json` (partial — untranslated keys fall back to English):
+Example `it.json` (partial — untranslated keys fall back to English):
 
 ```json
 {
-  "TileComputerName": "Computernaam",
-  "TileNetwork": "Netwerk",
-  "QuickActions": "Snelle acties",
-  "MenuQuit": "Afsluiten"
+  "TileComputerName": "Nome computer",
+  "TileNetwork": "Rete",
+  "QuickActions": "Azioni rapide",
+  "MenuQuit": "Esci"
 }
 ```
 
