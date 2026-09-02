@@ -110,7 +110,7 @@
 
             <!-- ===================== 2. INFO ITEMS GRID ====================
                  2-column layout. ScrollViewer caps the height when more
-                 than 6 tiles are configured so the popup never grows past
+                 than 8 tiles are configured so the popup never grows past
                  the screen height. -->
             <ScrollViewer Grid.Row="2"
                           MaxHeight="360"
