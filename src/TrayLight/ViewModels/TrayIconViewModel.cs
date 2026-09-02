@@ -142,9 +142,10 @@ public partial class TrayIconViewModel : ObservableObject, IDisposable
             Environment.MachineName,
         };
 
-        // Line 2 — IPv4 of the selected physical adapter (empty => offline).
+        // Line 2 — IPv4 of the routing-active adapter (empty => offline).
         var selection = Services.Providers.NetworkAdapterSelector.SelectBest(
-            Services.Providers.NetworkAdapterSelector.EnumerateLiveAdapters());
+            Services.Providers.NetworkAdapterSelector.EnumerateLiveAdapters(),
+            Services.Providers.NetworkAdapterSelector.GetRouteInterfaceIndex());
         lines.Add(string.IsNullOrEmpty(selection?.IPv4)
             ? Resources.Strings.StatusOffline
             : selection!.IPv4);

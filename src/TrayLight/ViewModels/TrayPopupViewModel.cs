@@ -1034,25 +1034,16 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
     {
         try
         {
-            // Excludes virtual adapters (Hyper-V, VMware, …) and APIPA
-            // addresses, preferring the physical adapter that owns the default
-            // gateway - see NetworkAdapterSelector.
-            var selection = TrayLight.Services.Providers.NetworkAdapterSelector.SelectBest(
-                TrayLight.Services.Providers.NetworkAdapterSelector.EnumerateLiveAdapters());
+            // Route-based detection: shows the IP of the interface Windows would
+            // actually use to reach the internet (VPN IP on a full tunnel, the
+            // routed link on a split tunnel) and lists every active adapter in
+            // the tooltip - see NetworkAdapterSelector / NetworkDisplay.
+            var summary = TrayLight.Services.Providers.NetworkDisplay.Describe();
 
-            if (selection is null)
+            if (!summary.Online)
                 return (Strings.StatusOffline, string.Empty, Strings.TooltipNoNetworkConnection, false);
 
-            var ipv4 = selection.IPv4;
-            var name = selection.Adapter.Type ==
-                       System.Net.NetworkInformation.NetworkInterfaceType.Wireless80211
-                ? selection.Adapter.Name
-                : Strings.NetworkEthernet;
-
-            // The tooltip keeps the full IPv4 as a fallback in case the tile
-            // ever clips the value on very narrow layouts.
-            return (name, ipv4,
-                $"{selection.Adapter.Description}\n{Strings.Format("Tooltip_NetworkIPv4Format", ipv4)}", true);
+            return (summary.Label, summary.IPv4, summary.Tooltip, true);
         }
         catch
         {

@@ -83,6 +83,9 @@ public static class Strings
     public static string StatusOffline         => Get(nameof(StatusOffline));
     public static string StatusVirtualMachineSerial => Get(nameof(StatusVirtualMachineSerial));
     public static string NetworkEthernet       => Get(nameof(NetworkEthernet));
+    public static string NetworkWifi           => Get(nameof(NetworkWifi));
+    public static string NetworkVpn            => Get(nameof(NetworkVpn));
+    public static string NetworkActiveMarker   => Get(nameof(NetworkActiveMarker));
     public static string RelativeUnknown       => Get(nameof(RelativeUnknown));
     public static string RelativeJustNow       => Get(nameof(RelativeJustNow));
 
