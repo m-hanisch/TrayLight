@@ -261,7 +261,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         {
             case InfoItemType.ComputerName:
                 vm.Value = _systemInfo.MachineName;
-                vm.ValueTooltip = $"{_systemInfo.MachineName} (click to copy)";
+                vm.ValueTooltip = $"{_systemInfo.MachineName} {Strings.TooltipClickToCopy}";
                 vm.ClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(
                     () => CopyToClipboard(_systemInfo.MachineName));
                 break;
@@ -269,7 +269,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
             case InfoItemType.OsVersion:
                 var (osDisplay, osDetail) = GetOsVersionDisplay(_systemInfo.OsVersion);
                 vm.Value = osDisplay;
-                vm.ValueTooltip = $"{osDetail} (click to copy)";
+                vm.ValueTooltip = $"{osDetail} {Strings.TooltipClickToCopy}";
                 vm.ClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(
                     () => CopyToClipboard(osDetail));
                 // OS version is informational - never a warning.
@@ -313,7 +313,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
             case InfoItemType.SerialNumber:
                 var serial = ReadSerialNumber();
                 vm.Value = serial;
-                vm.ValueTooltip = $"{serial} (click to copy)";
+                vm.ValueTooltip = $"{serial} {Strings.TooltipClickToCopy}";
                 vm.ClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(
                     () => CopyToClipboard(serial));
                 break;
@@ -418,7 +418,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         if (!enrolled && lastSync is null)
         {
             vm.Value = Strings.StatusNotEnrolled;
-            vm.ValueTooltip = "Device is not Intune managed.";
+            vm.ValueTooltip = Strings.TooltipNotIntuneManaged;
             vm.HasWarning = false;
             // No sync to trigger - make the tile non-interactive.
             vm.IsClickable = false;
@@ -431,8 +431,8 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
             // Enrolled but no readable timestamp (no PushLaunch task yet,
             // no IME logs, etc.). Don't lie with "just now".
             vm.Value = Strings.StatusUnknown;
-            vm.ValueTooltip = "Device is Intune managed but the last sync time "
-                + "could not be determined.\nClick to sync now.";
+            vm.ValueTooltip = Strings.TooltipIntuneSyncTimeUnknown
+                + "\n" + Strings.TooltipClickToSyncNow;
             vm.HasWarning = false;
             vm.IsClickable = true;
             vm.ClickCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(
@@ -445,7 +445,11 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         // otherwise appear as "in the future" or "hours ago" on every popup.
         var age = DateTime.Now - lastSync.Value;
         vm.Value = FormatRelative(age);
-        vm.ValueTooltip = $"Last Intune sync: {lastSync:dd.MM.yyyy HH:mm} ({source})\nClick to sync now.";
+        // The technical sync source ({source}) is logged above, not shown to the
+        // user - the tooltip stays clean and fully localized.
+        vm.ValueTooltip = Strings.Format("Tooltip_LastIntuneSync",
+                lastSync.Value.ToString("dd.MM.yyyy HH:mm"))
+            + "\n" + Strings.TooltipClickToSyncNow;
         // Stale Intune sync is informational only - not a warning.
         vm.HasWarning = false;
         vm.IsClickable = true;
@@ -986,12 +990,29 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
             var display = $"Win {versionNumber} {EditionShort(edition)} {displayVersion}".Trim();
             display = System.Text.RegularExpressions.Regex.Replace(display, @"\s+", " ");
             var detail  = ubr is null ? $"Build {build}" : $"Build {build}.{ubr}";
-            return (display, $"{StripMicrosoft(product)} {edition} {displayVersion} ({detail})".Trim());
+
+            // ProductName often already carries the edition (e.g. "Windows 11
+            // Enterprise"); ComposeOsDetail avoids appending it twice.
+            return (display, ComposeOsDetail(product, edition, displayVersion, detail));
         }
         catch
         {
             return (StripMicrosoft(fallback), fallback);
         }
+    }
+
+    /// <summary>
+    /// Builds the long OS detail string, appending the EditionID only when the
+    /// product name doesn't already contain it (avoids "Enterprise Enterprise").
+    /// </summary>
+    internal static string ComposeOsDetail(string product, string edition, string displayVersion, string buildDetail)
+    {
+        var productName = StripMicrosoft(product);
+        var editionSuffix = !string.IsNullOrEmpty(edition) &&
+            productName.IndexOf(edition, StringComparison.OrdinalIgnoreCase) < 0
+            ? $" {edition}" : string.Empty;
+        var detailText = $"{productName}{editionSuffix} {displayVersion} ({buildDetail})".Trim();
+        return System.Text.RegularExpressions.Regex.Replace(detailText, @"\s+", " ");
     }
 
     private static string EditionShort(string edition) => edition switch
@@ -1020,7 +1041,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
                 TrayLight.Services.Providers.NetworkAdapterSelector.EnumerateLiveAdapters());
 
             if (selection is null)
-                return (Strings.StatusOffline, string.Empty, "No active network connection.", false);
+                return (Strings.StatusOffline, string.Empty, Strings.TooltipNoNetworkConnection, false);
 
             var ipv4 = selection.IPv4;
             var name = selection.Adapter.Type ==
@@ -1030,7 +1051,8 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
 
             // The tooltip keeps the full IPv4 as a fallback in case the tile
             // ever clips the value on very narrow layouts.
-            return (name, ipv4, $"{selection.Adapter.Description}\nIPv4: {ipv4}", true);
+            return (name, ipv4,
+                $"{selection.Adapter.Description}\n{Strings.Format("Tooltip_NetworkIPv4Format", ipv4)}", true);
         }
         catch
         {
@@ -1050,7 +1072,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
             vm.Value = status.StateDisplay;
             vm.ValueTooltip = string.IsNullOrEmpty(status.TenantName)
                 ? status.StateDisplay
-                : $"{status.StateDisplay}\nTenant: {status.TenantName}";
+                : $"{status.StateDisplay}\n{Strings.Format("Tooltip_EntraTenantFormat", status.TenantName)}";
             // Identity tile is informational - never a warning.
         }
         catch

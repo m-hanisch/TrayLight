@@ -249,4 +249,56 @@ public class LocalizationTests
             Directory.Delete(dir, recursive: true);
         }
     }
+
+    // ---- Tile tooltips are localized (issue #18) --------------------------
+
+    [Fact]
+    public void Tile_tooltips_come_from_the_localization_service()
+    {
+        WithUiCulture("en-US", () =>
+        {
+            Assert.Equal("(click to copy)", Strings.TooltipClickToCopy);
+            Assert.Equal("Click to sync now.", Strings.TooltipClickToSyncNow);
+            Assert.Equal("Last Intune sync: 01.01.2026 08:00",
+                Strings.Format("Tooltip_LastIntuneSync", "01.01.2026 08:00"));
+        });
+
+        WithUiCulture("de-DE", () =>
+        {
+            Assert.Equal("(zum Kopieren klicken)", Strings.TooltipClickToCopy);
+            Assert.Equal("Zum Synchronisieren klicken.", Strings.TooltipClickToSyncNow);
+            Assert.Equal("Letzter Intune Sync: 01.01.2026 08:00",
+                Strings.Format("Tooltip_LastIntuneSync", "01.01.2026 08:00"));
+        });
+
+        WithUiCulture("fr-FR", () =>
+        {
+            Assert.Equal("(cliquer pour copier)", Strings.TooltipClickToCopy);
+            Assert.Equal("Cliquer pour synchroniser.", Strings.TooltipClickToSyncNow);
+            Assert.Equal("Derniere synchro Intune : 01.01.2026 08:00",
+                Strings.Format("Tooltip_LastIntuneSync", "01.01.2026 08:00"));
+        });
+    }
+
+    [Fact]
+    public void OsDetail_does_not_duplicate_the_edition()
+    {
+        // ProductName already contains "Enterprise" - it must not be appended again.
+        var detail = TrayPopupViewModel.ComposeOsDetail(
+            "Windows 11 Enterprise", "Enterprise", "25H2", "Build 26200.8655");
+
+        Assert.Equal("Windows 11 Enterprise 25H2 (Build 26200.8655)", detail);
+        Assert.DoesNotContain("Enterprise Enterprise", detail, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void OsDetail_appends_edition_when_product_name_omits_it()
+    {
+        // Older ProductName values ("Windows 10 Pro") already include the edition,
+        // but when they don't, the EditionID is appended once.
+        var detail = TrayPopupViewModel.ComposeOsDetail(
+            "Windows 11", "Enterprise", "25H2", "Build 26200.8655");
+
+        Assert.Equal("Windows 11 Enterprise 25H2 (Build 26200.8655)", detail);
+    }
 }

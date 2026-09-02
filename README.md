@@ -217,6 +217,12 @@ is fully deployable at scale via a script or an **Intune Win32 app** (see
 Only keys you translate need to be present; anything omitted falls back to
 English.
 
+> **Keep custom translations in sync after upgrades.** New TrayLight versions may
+> add new keys (for example the tile tooltip keys added in 2.1.2). Missing keys
+> fall back to English automatically, so nothing breaks — but after upgrading,
+> re-check your custom `<language>.json` against the current `en.json` and add
+> any new keys to keep the UI fully translated.
+
 Example `nl.json` (partial — untranslated keys fall back to English):
 
 ```json

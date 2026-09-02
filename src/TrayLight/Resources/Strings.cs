@@ -86,6 +86,13 @@ public static class Strings
     public static string RelativeUnknown       => Get(nameof(RelativeUnknown));
     public static string RelativeJustNow       => Get(nameof(RelativeJustNow));
 
+    // --- Tile tooltips -----------------------------------------------------
+    public static string TooltipClickToCopy           => Get("Tooltip_ClickToCopy");
+    public static string TooltipClickToSyncNow        => Get("Tooltip_ClickToSyncNow");
+    public static string TooltipNotIntuneManaged      => Get("Tooltip_NotIntuneManaged");
+    public static string TooltipIntuneSyncTimeUnknown => Get("Tooltip_IntuneSyncTimeUnknown");
+    public static string TooltipNoNetworkConnection   => Get("Tooltip_NoNetworkConnection");
+
     // --- Quick Actions defaults -------------------------------------------
     public static string DefaultShortcutTitle    => Get(nameof(DefaultShortcutTitle));
     public static string DefaultShortcutSubtitle => Get(nameof(DefaultShortcutSubtitle));
