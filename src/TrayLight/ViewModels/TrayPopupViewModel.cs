@@ -88,22 +88,8 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
     /// &lt;24h =&gt; "Xh Ym ago", otherwise "X days ago".
     /// Negative or absurdly large values collapse to "unknown".
     /// </summary>
-    internal static string FormatRelative(TimeSpan elapsed)
-    {
-        if (elapsed < TimeSpan.Zero || elapsed.TotalDays > 3650) return Strings.RelativeUnknown;
-        if (elapsed.TotalMinutes < 1) return Strings.RelativeJustNow;
-        if (elapsed.TotalMinutes < 60)
-        {
-            var m = (int)elapsed.TotalMinutes;
-            return Strings.Format(m == 1 ? "RelativeMinuteAgoFormat" : "RelativeMinutesAgoFormat", m);
-        }
-        if (elapsed.TotalHours < 24)
-        {
-            return Strings.Format("RelativeHoursMinutesAgoFormat", elapsed.Hours, elapsed.Minutes);
-        }
-        var d = (int)elapsed.TotalDays;
-        return Strings.Format(d == 1 ? "RelativeDayAgoFormat" : "RelativeDaysAgoFormat", d);
-    }
+    internal static string FormatRelative(TimeSpan elapsed) =>
+        TrayLight.Services.RelativeTimeFormatter.FormatRelative(elapsed);
 
     public TrayPopupViewModel(
         IConfigurationService configService,
@@ -330,14 +316,8 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         return vm;
     }
 
-    private static string FormatUptime(TimeSpan uptime)
-    {
-        if (uptime.TotalDays >= 2)  return Strings.Format("UptimeDaysHoursAgoFormat", (int)uptime.TotalDays, uptime.Hours);
-        if (uptime.TotalDays >= 1)  return Strings.Format("UptimeOneDayHoursAgoFormat", uptime.Hours);
-        if (uptime.TotalHours >= 1) return Strings.Format("UptimeHoursMinutesAgoFormat", uptime.Hours, uptime.Minutes);
-        if (uptime.TotalMinutes >= 1) return Strings.Format("UptimeMinutesAgoFormat", (int)uptime.TotalMinutes);
-        return Strings.RelativeJustNow;
-    }
+    private static string FormatUptime(TimeSpan uptime) =>
+        TrayLight.Services.RelativeTimeFormatter.FormatUptime(uptime);
 
     private static void CopyToClipboard(string text)
     {

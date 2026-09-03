@@ -1,6 +1,6 @@
 using System.Runtime.Versioning;
+using TrayLight.Resources;
 using TrayLight.Services.Providers;
-using TrayLight.ViewModels;
 
 namespace TrayLight.Services.Actions;
 
@@ -127,10 +127,10 @@ public sealed class ShortcutPlaceholderResolver : IShortcutPlaceholderResolver
     private static string DefaultIntuneSync()
     {
         var status = IntuneSyncProvider.ReadStatus();
-        if (!status.IsEnrolled) return "Not enrolled";
+        if (!status.IsEnrolled) return Strings.StatusNotEnrolled;
         if (status.LastSyncUtc is { } sync)
-            return TrayPopupViewModel.FormatRelative(DateTime.UtcNow - sync);
-        return "Unknown";
+            return RelativeTimeFormatter.FormatRelative(DateTime.UtcNow - sync);
+        return Strings.StatusUnknown;
     }
 
     [SupportedOSPlatform("windows")]
