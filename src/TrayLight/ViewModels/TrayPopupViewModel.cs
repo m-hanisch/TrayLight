@@ -64,6 +64,9 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool   _showAttribution = true;
 
     public ObservableCollection<InfoItemViewModel> InfoItems { get; } = new();
+    // Tiles grouped into rows of two so each grid row sizes independently: a
+    // row with a wrapped (long-language) title grows, the others stay compact.
+    public ObservableCollection<IReadOnlyList<InfoItemViewModel>> InfoItemRows { get; } = new();
     public ObservableCollection<ShortcutViewModel> Shortcuts { get; } = new();
     public ObservableCollection<InfoTextLine>      InfoTextLines { get; } = new();
 
@@ -216,7 +219,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         InfoItems.Clear();
 
         // Take only enabled items with a valid grid slot, ordered by position.
-        // Up to 8 tiles (3-column grid), matching the ADMX Position range 0..7.
+        // Up to 8 tiles (2-column grid), matching the ADMX Position range 0..7.
         var ordered = config.InfoItems
             .Where(i => i.Enabled && i.Position is >= 0 and <= 7)
             .OrderBy(i => i.Position)
@@ -226,6 +229,11 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         {
             InfoItems.Add(BuildInfoItem(item));
         }
+
+        // Group into rows of two for the per-row-height grid layout.
+        InfoItemRows.Clear();
+        for (int i = 0; i < InfoItems.Count; i += 2)
+            InfoItemRows.Add(InfoItems.Skip(i).Take(2).ToList());
     }
 
     private InfoItemViewModel BuildInfoItem(InfoItemConfig cfg)
