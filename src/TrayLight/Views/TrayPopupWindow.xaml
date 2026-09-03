@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:TrayPopupViewModel}"
         Title="TrayLight"
-        Width="400"
+        Width="520"
         SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -109,11 +109,11 @@
                     Margin="0,12,0,16" />
 
             <!-- ===================== 2. INFO ITEMS GRID ====================
-                 2-column layout. The window is SizeToContent=Height, so it
-                 grows to show every tile. MaxHeight is set at runtime to the
-                 usable screen work area (see TrayPopupWindow.OnSizeChanged), so
-                 the ScrollViewer only ever scrolls as a last-resort safety net
-                 on very small screens. -->
+                 3-column layout so the popup grows wider rather than tall. The
+                 window is SizeToContent=Height, so it still grows to show every
+                 tile; MaxHeight is set at runtime to the usable screen work area
+                 (see TrayPopupWindow.OnSizeChanged), so the ScrollViewer only
+                 ever scrolls as a last-resort safety net on very small screens. -->
             <ScrollViewer x:Name="TileScroll"
                           Grid.Row="2"
                           VerticalScrollBarVisibility="Auto"
@@ -121,7 +121,7 @@
                 <ItemsControl ItemsSource="{Binding InfoItems}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="2" />
+                            <UniformGrid Columns="3" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>

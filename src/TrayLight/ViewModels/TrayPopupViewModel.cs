@@ -216,7 +216,7 @@ public partial class TrayPopupViewModel : ObservableObject, IDisposable
         InfoItems.Clear();
 
         // Take only enabled items with a valid grid slot, ordered by position.
-        // Up to 8 tiles (4 rows × 2 columns), matching the ADMX Position range 0..7.
+        // Up to 8 tiles (3-column grid), matching the ADMX Position range 0..7.
         var ordered = config.InfoItems
             .Where(i => i.Enabled && i.Position is >= 0 and <= 7)
             .OrderBy(i => i.Position)
