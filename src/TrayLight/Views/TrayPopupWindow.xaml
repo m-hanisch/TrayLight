@@ -109,11 +109,13 @@
                     Margin="0,12,0,16" />
 
             <!-- ===================== 2. INFO ITEMS GRID ====================
-                 2-column layout. ScrollViewer caps the height when more
-                 than 8 tiles are configured so the popup never grows past
-                 the screen height. -->
-            <ScrollViewer Grid.Row="2"
-                          MaxHeight="360"
+                 2-column layout. The window is SizeToContent=Height, so it
+                 grows to show every tile. MaxHeight is set at runtime to the
+                 usable screen work area (see TrayPopupWindow.OnSizeChanged), so
+                 the ScrollViewer only ever scrolls as a last-resort safety net
+                 on very small screens. -->
+            <ScrollViewer x:Name="TileScroll"
+                          Grid.Row="2"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding InfoItems}">
