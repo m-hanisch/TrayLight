@@ -41,7 +41,7 @@
   "StatusOffline": "Offline",
   "StatusVirtualMachineSerial": "N/B (Virtuele machine)",
   "NetworkEthernet": "Ethernet",
-  "NetworkWifi": "WiFi",
+  "NetworkWifi": "Wi-Fi",
   "NetworkVpn": "VPN",
   "NetworkActiveMarker": "actief",
   "StoragePercentUsedFormat": "{0}% gebruikt",
