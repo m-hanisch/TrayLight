@@ -94,4 +94,40 @@ public class NetworkInfoProviderTests
             System.Globalization.CultureInfo.CurrentUICulture = original;
         }
     }
+
+    [Fact]
+    public void Tooltip_appends_ssid_to_wireless_entries()
+    {
+        var original = System.Globalization.CultureInfo.CurrentUICulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentUICulture =
+                System.Globalization.CultureInfo.GetCultureInfo("en-US");
+
+            var wifi = new NetworkAdapterSelector.ActiveAdapter(
+                new NetworkAdapterSelector.AdapterInfo("Wi-Fi", "Intel Wi-Fi 6",
+                    System.Net.NetworkInformation.NetworkInterfaceType.Wireless80211,
+                    IsUp: true, HasGateway: true, IPv4Addresses: new[] { "10.0.0.4" },
+                    Id: "wifi-guid", InterfaceIndex: 5),
+                "10.0.0.4", NetworkAdapterSelector.ConnectionKind.WiFi, IsActive: true);
+
+            var eth = new NetworkAdapterSelector.ActiveAdapter(
+                new NetworkAdapterSelector.AdapterInfo("Ethernet", "Intel NIC",
+                    System.Net.NetworkInformation.NetworkInterfaceType.Ethernet,
+                    IsUp: true, HasGateway: true, IPv4Addresses: new[] { "192.168.1.50" },
+                    Id: "", InterfaceIndex: 6),
+                "192.168.1.50", NetworkAdapterSelector.ConnectionKind.Ethernet, IsActive: false);
+
+            // Inject the SSID resolver so the test doesn't depend on live Wi-Fi.
+            var tooltip = NetworkDisplay.BuildTooltip(new[] { wifi, eth }, ssidResolver: _ => "CorpNet");
+
+            Assert.Equal(
+                "WiFi CorpNet: 10.0.0.4 (active)\nEthernet: 192.168.1.50",
+                tooltip);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = original;
+        }
+    }
 }

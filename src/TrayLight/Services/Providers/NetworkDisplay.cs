@@ -45,13 +45,17 @@ public static class NetworkDisplay
     }
 
     /// <summary>
-    /// One line per active adapter ("Ethernet: 192.168.170.131 (active)"), the
+    /// One line per active adapter ("WiFi CorpNet: 10.0.0.4 (active)"), the
     /// routing-active one first and flagged with the localized "(active)" marker.
+    /// Wireless entries include the SSID. <paramref name="ssidResolver"/> is a
+    /// test seam; production uses the native lookup.
     /// </summary>
-    public static string BuildTooltip(IReadOnlyList<NetworkAdapterSelector.ActiveAdapter> active) =>
+    public static string BuildTooltip(
+        IReadOnlyList<NetworkAdapterSelector.ActiveAdapter> active,
+        Func<string, string?>? ssidResolver = null) =>
         string.Join("\n", active.Select(a =>
         {
-            var line = $"{Label(a, includeSsid: false)}: {a.IPv4}";
+            var line = $"{Label(a, includeSsid: true, ssidResolver)}: {a.IPv4}";
             return a.IsActive ? $"{line} ({Strings.NetworkActiveMarker})" : line;
         }));
 
@@ -59,17 +63,19 @@ public static class NetworkDisplay
     /// Localized medium label: "VPN", "WiFi {SSID}" (SSID only when
     /// <paramref name="includeSsid"/>) or "Ethernet".
     /// </summary>
-    public static string Label(NetworkAdapterSelector.ActiveAdapter a, bool includeSsid) => a.Kind switch
+    public static string Label(
+        NetworkAdapterSelector.ActiveAdapter a,
+        bool includeSsid,
+        Func<string, string?>? ssidResolver = null) => a.Kind switch
     {
         NetworkAdapterSelector.ConnectionKind.Vpn  => Strings.NetworkVpn,
-        NetworkAdapterSelector.ConnectionKind.WiFi => includeSsid ? WifiLabel(a.Adapter.Id) : Strings.NetworkWifi,
+        NetworkAdapterSelector.ConnectionKind.WiFi => includeSsid ? WifiLabel(a.Adapter.Id, ssidResolver) : Strings.NetworkWifi,
         _                                          => Strings.NetworkEthernet,
     };
 
-    [SupportedOSPlatform("windows")]
-    private static string WifiLabel(string nicId)
+    private static string WifiLabel(string nicId, Func<string, string?>? ssidResolver)
     {
-        var ssid = NetworkAdapterSelector.TryGetWifiSsid(nicId);
+        var ssid = (ssidResolver ?? NetworkAdapterSelector.TryGetWifiSsid)(nicId);
         return string.IsNullOrEmpty(ssid) ? Strings.NetworkWifi : $"{Strings.NetworkWifi} {ssid}";
     }
 }

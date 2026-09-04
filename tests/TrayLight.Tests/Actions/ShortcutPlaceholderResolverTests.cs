@@ -53,9 +53,23 @@ public class ShortcutPlaceholderResolverTests
         var result = await resolver.ExpandAsync(input);
 
         Assert.Equal(
-            "app:DESK-01|Win 11 Ent 25H2|4h 11m ago|66% used|Ethernet 192.168.199.52|" +
+            "app:DESK-01|Win 11 Ent 25H2|4h 11m ago|66% used|Ethernet - 192.168.199.52|" +
             "jdoe|CONTOSO|SN-12345|13m ago",
             result);
+    }
+
+    [Fact]
+    public async Task Network_placeholder_includes_wifi_ssid()
+    {
+        // The Network provider already resolves the SSID into its Value on WiFi;
+        // the placeholder joins it with the IP as "WiFi {SSID} - {IP}".
+        var resolver = new ShortcutPlaceholderResolver(new IInfoItemProvider[]
+        {
+            new FakeProvider(NetworkInfoProvider.TypeKey, "WiFi CorpNet", "10.0.0.4"),
+        });
+
+        Assert.Equal("WiFi CorpNet - 10.0.0.4",
+            await resolver.ExpandAsync("{{Network}}"));
     }
 
     [Fact]

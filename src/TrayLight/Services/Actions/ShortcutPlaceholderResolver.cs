@@ -90,15 +90,16 @@ public sealed class ShortcutPlaceholderResolver : IShortcutPlaceholderResolver
         if (!_providers.TryGetValue(NetworkInfoProvider.TypeKey, out var provider)) return null;
         var data = await provider.GetDataAsync(ct).ConfigureAwait(false);
 
-        // The Network tile splits "type" (Value, e.g. "Ethernet") and the IP
-        // (DetailText). The placeholder combines both, e.g. "Ethernet 192.168.0.5".
+        // The Network tile splits the connection label (Value, e.g. "WiFi
+        // CorpNet" / "Ethernet" / "VPN") and the IP (DetailText). The
+        // placeholder joins them as "{label} - {IP}", e.g. "WiFi CorpNet - 10.0.0.4".
         var detail = data.DetailText;
         if (string.IsNullOrWhiteSpace(detail) ||
             detail.StartsWith("(", StringComparison.Ordinal) ||
             string.Equals(detail, data.Value, StringComparison.OrdinalIgnoreCase))
             return data.Value;
 
-        return $"{data.Value} {detail}".Trim();
+        return $"{data.Value} - {detail}".Trim();
     }
 
     private static string? Safe(Func<string> source)
